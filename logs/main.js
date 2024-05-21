@@ -1,60 +1,135 @@
-const { request } = require('http');
-const ADDRESS = require('./info');
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const fs = require('fs');
+const path = require('path');
+const { Client } = require('ssh2');
+const servers = require('./info_servers');
 
-// // const username = 'admin'
-// // const password = 'fxw7ZvwWx@35112!'
+const destinationFolder = path.join(__dirname, 'all_logs_servers');
 
-// // const urlSrv = 'https://10.100.104.144:8088/deviceManager/ibase/i18n/i18n_resource.js?t=1544105949486'
+// Создаем папку для логов, если она не существует
+try {
+    fs.mkdirSync(destinationFolder, { recursive: true });
+} catch (err) {
+    if (err.code !== 'EEXIST') {
+        console.error('Ошибка при создании папки для логов:', err);
+        process.exit(1);
+    }
+}
 
-// // const xhr = new XMLHttpRequest()
+async function fetchLogsFromServer(serverConfig) {
+    return new Promise((resolve, reject) => {
+        const conn = new Client();
+        conn.on('ready', () => {
+            console.log(`Соединение с ${serverConfig.host} установлено`);
+            conn.sftp((err, sftp) => {
+                if (err) {
+                    console.error(`Ошибка SFTP: ${err.message}`);
+                    conn.end();
+                    return reject(err);
+                }
 
-// // xhr.open('GET', 'https://10.100.104.144:8088/deviceManager/ibase/i18n/i18n_resource.js?t=1544105949486', true)
-// // xhr.onload = () => {
-// //     if (xhr.status >= 200 && xhr.status < 300){
-// //         console.log('Good!', xhr.responseText)
-// //     } else {
-// //         console.error('Error', xhr.statusText)
-// //     }
-// // }
-// // xhr.onerror = () => {
-// //     console.error('Network Error')
-// // }
+                sftp.readdir(serverConfig.logPath, (err, list) => {
+                    if (err) {
+                        console.error(
+                            `Ошибка при чтении директории ${serverConfig.logPath}: ${err.message}`
+                        );
+                        conn.end();
+                        return reject(err);
+                    }
 
-// // xhr.send()
+                    if (list.length === 0) {
+                        conn.end();
+                        return reject(
+                            new Error(
+                                `Директория ${serverConfig.logPath} пуста`
+                            )
+                        );
+                    }
 
-// // // const auth = {
-// // //         usernamename: username,
-// // //         password: password
-// // // }
+                    console.log(
+                        `Содержимое директории ${serverConfig.logPath}:`,
+                        list
+                    );
 
-// // // axios.get(urlSrv, auth)
-// // //     .then(response => {
-// // //         console.log('responce.data')
-// // //     })
-// // //         .catch(error => {
-// // //             console.error('Error fetching logs', error)
-// // //         })
+                    const downloadPromises = list.map((file) => {
+                        const remoteFilePath = path.posix.join(
+                            serverConfig.logPath,
+                            file.filename
+                        );
+                        const localFilePath = path.join(
+                            destinationFolder,
+                            `${serverConfig.host}_${file.filename}`
+                        );
 
-const fetch_ased_data = async (url) => {
-    const res = await fetch(url);
-    // const data = await res.json();
-    return res;
-};
+                        console.log(
+                            `Копирование файла с ${remoteFilePath} на ${localFilePath}`
+                        );
 
-fetch_ased_data('https://10.100.104.144:8088')
-    .then((data) => console.log(data))
-    .catch((error) => console.log(error));
+                        return new Promise((res, rej) => {
+                            const readStream =
+                                sftp.createReadStream(remoteFilePath);
+                            const writeStream =
+                                fs.createWriteStream(localFilePath);
 
-// request(
-//     {
-//         rejectUnauthorized: false,
-//         url: 'https://10.100.104.144:8088/deviceManager/ibase/i18n/i18n_resource.js',
-//         method: 'GET',
-//     },
-//     function (err, response, body) {
-//         console.log(err);
-//         console.log(response);
-//         console.log(body);
-//     }
-// );
+                            readStream
+                                .on('error', (err) => {
+                                    console.error(
+                                        `Ошибка при чтении файла ${remoteFilePath}: ${err.message}`
+                                    );
+                                    rej(err);
+                                })
+                                .pipe(writeStream)
+                                .on('finish', () => {
+                                    console.log(
+                                        `Файл ${remoteFilePath} успешно скопирован`
+                                    );
+                                    res();
+                                })
+                                .on('error', (err) => {
+                                    console.error(
+                                        `Ошибка при записи файла ${localFilePath}: ${err.message}`
+                                    );
+                                    rej(err);
+                                });
+                        });
+                    });
+
+                    Promise.all(downloadPromises)
+                        .then(() => {
+                            conn.end();
+                            resolve();
+                        })
+                        .catch((err) => {
+                            conn.end();
+                            reject(err);
+                        });
+                });
+            });
+        })
+            .on('error', (err) => {
+                console.error(
+                    `Ошибка при подключении к ${serverConfig.host}: ${err.message}`
+                );
+                reject(err);
+            })
+            .connect({
+                host: serverConfig.host,
+                port: 22,
+                username: serverConfig.username,
+                password: serverConfig.password,
+            });
+    });
+}
+
+(async () => {
+    try {
+        for (const serverKey in servers) {
+            const serverConfig = servers[serverKey];
+            await fetchLogsFromServer(serverConfig);
+            console.log(`Логи с ${serverConfig.host} успешно скопированы`);
+        }
+        console.log('Все логи успешно скопированы');
+    } catch (err) {
+        console.error('Ошибка при копировании логов:', err);
+        process.exit(1);
+    }
+})();
