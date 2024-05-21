@@ -3,38 +3,47 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Log Screen</title>
+        <title>Logs Display</title>
+        <link
+            href="https://fonts.googleapis.com/css?family=Montserrat:700"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link rel="stylesheet" href="index.css" />
+        <style>
+            /* Скрыть элементы по умолчанию */
+            #logsList,
+            #logContent {
+                display: none;
+                background-color: rgb(31, 29, 33); /* Сделать фон белым */
+                padding: 10px;
+                margin-bottom: 50px; /* Добавить отступы */
+            }
+        </style>
     </head>
     <body>
-        <h1>Logs from Servers</h1>
-        <button id="fetchLogs">Fetch Logs</button>
+        <a class="square">
+            <div class="burgerwrap">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </a>
+
+        <a id="fetchLogs" class="boton"> Собрать логи </a>
+        <a class="square">
+            <div class="burgerwrap"><span></span> <span></span></div
+        ></a>
         <ul id="logsList"></ul>
-
-        <script>
-            document
-                .getElementById('fetchLogs')
-                .addEventListener('click', async () => {
-                    try {
-                        const response = await fetch('/logs-servers');
-                        if (!response.ok) {
-                            throw new Error('Сеть не в порядке !');
-                        }
-
-                        const data = await response.json();
-                        const logsList = document.getElementById('logsList');
-                        logsList.innerHTML = '';
-                        data.files.forEach((file) => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = file;
-                            logsList.appendChild(listItem);
-                        });
-                    } catch (error) {
-                        console.error(
-                            'Возникла проблема с операцией выборки:',
-                            error
-                        );
-                    }
-                });
-        </script>
+        <a class="square"
+            ><div class="burgerwrap"><span></span></div
+        ></a>
+        <ul id="logContent"></ul>
+        <script
+            src="https://code.jquery.com/jquery-latest.min.js"
+            type="text/javascript"
+        ></script>
+        <script type="text/javascript" src="index.js"></script>
+        <script type="text/javascript" src="button.js"></script>
     </body>
 </html>
