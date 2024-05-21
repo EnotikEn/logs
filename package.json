@@ -1,6 +1,7 @@
 {
     "dependencies": {
         "axios": "^1.6.8",
+        "express": "^4.19.2",
         "node": "^18.20.1",
         "node-ipmi": "^0.0.5",
         "openssh": "^1.0.6",
