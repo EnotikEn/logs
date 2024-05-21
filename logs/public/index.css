@@ -13,6 +13,7 @@ body {
 
 .botontext {
     position: absolute;
+    cursor: pointer;
     height: 100%;
     width: 100%;
     z-index: 1;
@@ -163,6 +164,7 @@ body {
 .square:hover {
     transform: rotate(135deg);
     border: 1px solid #fff;
+    cursor: pointer;
 }
 
 .square:hover .burgerwrap {
@@ -222,6 +224,8 @@ body {
 #logsList,
 #logContent {
     display: none;
+    width: 200px;
+    height: 50px;
     background-color: rgb(31, 29, 33);
     padding: 10px;
     margin: 10px auto;
@@ -229,4 +233,6 @@ body {
     color: #9f7f5e;
     list-style-type: none; /* Убрать маркеры списка */
     text-align: center; /* Выравнивание текста по центру */
+    font-size: 10px auto;
+    font-family: 'Montserrat', sans-serif;
 }
