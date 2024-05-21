@@ -167,6 +167,10 @@ body {
     cursor: pointer;
 }
 
+.square.hidden {
+    display: none !important;
+}
+
 .square:hover .burgerwrap {
     transform: rotate(-135deg);
 }
@@ -235,4 +239,40 @@ body {
     text-align: center; /* Выравнивание текста по центру */
     font-size: 10px auto;
     font-family: 'Montserrat', sans-serif;
+}
+
+/* menu */
+.menu {
+    background-color: #9f7f5e; /* Цвет фона */
+    position: absolute;
+    top: 60px; /* Отступ сверху */
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px; /* Более округлая форма */
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Тень */
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    min-width: 200px; /* Минимальная ширина */
+}
+
+.menu.active {
+    display: block;
+    opacity: 1;
+}
+
+.menu a {
+    display: block;
+    padding: 15px 20px; /* Отступы */
+    color: #ffffff; /* Цвет текста */
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif; /* Шрифт */
+    font-size: 16px; /* Размер текста */
+    transition: background-color 0.3s ease; /* Плавное изменение цвета фона */
+}
+
+.menu a:hover {
+    background-color: #1f1d21; /* Цвет фона при наведении */
 }

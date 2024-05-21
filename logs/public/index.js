@@ -27,3 +27,78 @@ document.getElementById('fetchLogs').addEventListener('click', async () => {
         console.error('Проблема с запросом:', error);
     }
 });
+
+document.getElementById('toggleButton2').addEventListener('click', function () {
+    var logsList = document.getElementById('logsList');
+    if (logsList.style.display === 'none') {
+        logsList.style.display = 'block';
+    } else {
+        logsList.style.display = 'none';
+    }
+});
+
+document.getElementById('toggleButton1').addEventListener('click', function () {
+    var logContent = document.getElementById('logContent');
+    if (logContent.style.display === 'none') {
+        logContent.style.display = 'block';
+    } else {
+        logContent.style.display = 'none';
+    }
+});
+
+// document.getElementById('toggleButton3').addEventListener('click', function () {
+//     console.log('Click event fired!'); // Проверка срабатывания обработчика события
+//     var menu = this.querySelector('.menu');
+//     console.log(menu); // Проверка, выбирается ли меню правильно
+//     menu.classList.toggle('active'); // Добавляем или удаляем класс "active" для меню
+// });
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     document.body.addEventListener('click', function (event) {
+//         var toggleButton = event.target.closest('#toggleButton');
+//         if (toggleButton) {
+//             var menu = toggleButton.querySelector('.menu');
+//             if (menu) {
+//                 menu.classList.toggle('active');
+//             }
+//         }
+//     });
+// });
+
+document.addEventListener('DOMContentLoaded', function () {
+    var toggleButton = document.getElementById('toggleButton3');
+    toggleButton.addEventListener('click', function () {
+        var menu = document.getElementById('menu');
+        if (menu) {
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+            } else {
+                menu.classList.add('active');
+            }
+        }
+    });
+});
+
+// document.addEventListener('DOMContentLoaded', function () {
+//     var toggleButton = document.getElementById('toggleButton3');
+//     var menu = document.getElementById('menu');
+//     var fetchLogs = document.getElementById('fetchLogs');
+
+//     toggleButton.addEventListener('click', function (event) {
+//         event.stopPropagation();
+//         menu.classList.toggle('active');
+//         fetchLogs.classList.toggle('hidden');
+//     });
+
+//     // Добавим обработчик для клика по документу
+//     document.addEventListener('click', function (event) {
+//         if (
+//             menu.classList.contains('active') &&
+//             !menu.contains(event.target) &&
+//             !toggleButton.contains(event.target)
+//         ) {
+//             menu.classList.remove('active');
+//             fetchLogs.classList.remove('hidden');
+//         }
+//     });
+// });
