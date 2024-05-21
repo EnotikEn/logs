@@ -120,7 +120,7 @@ async function fetchLogsFromServer(serverConfig) {
     });
 }
 
-(async () => {
+async function fetchAllLogs() {
     try {
         for (const serverKey in servers) {
             const serverConfig = servers[serverKey];
@@ -132,4 +132,6 @@ async function fetchLogsFromServer(serverConfig) {
         console.error('Ошибка при копировании логов:', err);
         process.exit(1);
     }
-})();
+}
+
+module.exports = fetchAllLogs;
